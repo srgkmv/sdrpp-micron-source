@@ -14,6 +14,7 @@ namespace micron {
         enabled = 0x1;
         sampleRateIndex = MICRON_SAMP_RATE_384KHZ;
         freq = 0;
+        att = 0;
         gain = 0;
         bexit = false;
 
@@ -93,7 +94,13 @@ namespace micron {
         controlRx();
     }
 
-    void Client::setGain(int gain) {
+    void Client::setAtt(int att) {
+        this->att = att;
+        controlRx();
+    }
+
+    void Client::setGain(int gain)
+    {
         this->gain = gain;
         controlRx();
     }
@@ -109,9 +116,12 @@ namespace micron {
         lBa[11] = ((char)enabled);   //enable
         lBa[12] = ((char)sampleRateIndex);   // rate  1 for 96 kHz,
         *(unsigned int*)(lBa + 13) = __bswap_32(freq); //4 bytes frequency
-        lBa[17] = ((char)gain);   //attenuation
-        for(int i =0 ;i < 14; i++) //14 binary zeroes
-            lBa[18+i] = 0x00;
+        lBa[17] = ((char)att);   //attenuation
+        lBa[18] = 0x0;//nbs_on
+        lBa[19] = 0x0;//nbs_period
+        lBa[20] = ((char)gain);//rx_shift
+        for(int i = 21; i < MICRON_CTRL_PACKET_SIZE; i++)
+            lBa[i] = 0x00;
 
         uint32_t iBytesWritten = 0;
         //FT_Write(m_pDeviceHandle, lBa.data(), lBa.size(), &iBytesWritten);

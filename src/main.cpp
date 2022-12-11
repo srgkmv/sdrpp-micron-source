@@ -107,6 +107,7 @@ private:
 
         // Default config
         srId = samplerates.valueId(micron::MICRON_SAMP_RATE_384KHZ);
+        att = 0;
         gain = 0;
 
         // Load config
@@ -116,6 +117,9 @@ private:
         if (config.conf["devices"][selectedSerial].contains("samplerate")) {
             int sr = config.conf["devices"][selectedSerial]["samplerate"];
             if (samplerates.keyExists(sr)) { srId = samplerates.keyId(sr); }
+        }
+        if (config.conf["devices"][selectedSerial].contains("att")) {
+            att = config.conf["devices"][selectedSerial]["att"];
         }
         if (config.conf["devices"][selectedSerial].contains("gain")) {
             gain = config.conf["devices"][selectedSerial]["gain"];
@@ -167,7 +171,7 @@ private:
         // TODO: Check if the USB commands are accepted before start
         _this->dev->setSamplerate(_this->samplerates[_this->srId]);
         _this->dev->setFrequency(_this->freq);
-        _this->dev->setGain(_this->gain);
+        _this->dev->setAtt(_this->att);
 
         _this->running = true;
         spdlog::info("MicronSourceModule '{0}': Start!", _this->name);
@@ -237,9 +241,21 @@ private:
 
         // TODO: Device parameters
 
-        SmGui::LeftLabel("LNA Gain");
+        SmGui::LeftLabel("ATT");
         SmGui::FillWidth();
-        if (SmGui::SliderInt("##micron_source_lna_gain", &_this->gain, 0, 31)) {
+        if (SmGui::SliderInt("##micron_source_att", &_this->att, 0, 31)) {
+            if (_this->running) {
+                _this->dev->setAtt(_this->att);
+            }
+            if (!_this->selectedSerial.empty()) {
+                config.acquire();
+                config.conf["devices"][_this->selectedSerial]["att"] = _this->att;
+                config.release(true);
+            }
+        }
+        SmGui::LeftLabel("CIC Gain");
+        SmGui::FillWidth();
+        if (SmGui::SliderInt("##micron_source_gain", &_this->gain, 0, 8)) {
             if (_this->running) {
                 _this->dev->setGain(_this->gain);
             }
@@ -266,6 +282,7 @@ private:
     double freq;
     int devId = 0;
     int srId = 0;
+    int att = 0;
     int gain = 0;
 
     bool firstSelect = true;
