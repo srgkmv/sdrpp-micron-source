@@ -13,7 +13,7 @@ namespace micron {
         std::string serial;
         unsigned int index;
 
-        bool operator==(const Info& b) {
+        bool operator==(const Info& b) const {
             return serial == b.serial && index == b.index;
         }
     };

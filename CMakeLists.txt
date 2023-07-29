@@ -4,7 +4,7 @@ project(micron_source)
 file(GLOB SRC "src/*.cpp")
 
 add_library(micron_source SHARED ${SRC})
-target_link_libraries(micron_source PRIVATE sdrpp_core ftdi1 )
+target_link_libraries(micron_source PRIVATE sdrpp_core ftdi1 fmt)
 set_target_properties(micron_source PROPERTIES PREFIX "")
 
 target_include_directories(micron_source PRIVATE "src/")

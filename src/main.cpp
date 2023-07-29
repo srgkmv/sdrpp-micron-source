@@ -1,5 +1,5 @@
 #include "micron.h"
-#include <spdlog/spdlog.h>
+#include <utils/flog.h>
 #include <module.h>
 #include <gui/gui.h>
 #include <signal_path/signal_path.h>
@@ -148,12 +148,12 @@ private:
         }
 
         core::setInputSampleRate(_this->sampleRate);
-        spdlog::info("MicronSourceModule '{0}': Menu Select!", _this->name);
+        flog::info("MicronSourceModule '{0}': Menu Select!", _this->name);
     }
 
     static void menuDeselected(void* ctx) {
         MicronSourceModule* _this = (MicronSourceModule*)ctx;
-        spdlog::info("MicronSourceModule '{0}': Menu Deselect!", _this->name);
+        flog::info("MicronSourceModule '{0}': Menu Deselect!", _this->name);
     }
 
     static void start(void* ctx) {
@@ -174,7 +174,7 @@ private:
         _this->dev->setAtt(_this->att);
 
         _this->running = true;
-        spdlog::info("MicronSourceModule '{0}': Start!", _this->name);
+        flog::info("MicronSourceModule '{0}': Start!", _this->name);
     }
 
     static void stop(void* ctx) {
@@ -187,7 +187,7 @@ private:
         _this->dev->close();
         _this->lnk.stop();
 
-        spdlog::info("MicronSourceModule '{0}': Stop!", _this->name);
+        flog::info("MicronSourceModule '{0}': Stop!", _this->name);
     }
 
     static void tune(double freq, void* ctx) {
@@ -197,7 +197,7 @@ private:
             _this->dev->setFrequency(freq);
         }
         _this->freq = freq;
-        spdlog::info("MicronSourceModule '{0}': Tune: {1}!", _this->name, freq);
+        flog::info("MicronSourceModule '{0}': Tune: {1}!", _this->name, freq);
     }
 
     static void menuHandler(void* ctx) {
