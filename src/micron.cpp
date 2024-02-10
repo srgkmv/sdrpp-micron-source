@@ -1,5 +1,5 @@
 #include "micron.h"
-#include <spdlog/spdlog.h>
+#include <utils/flog.h>
 #include <libftdi1/ftdi.h>
 #include <chrono>
 
@@ -20,20 +20,20 @@ namespace micron {
 
         if ((ftdi = ftdi_new()) == 0)
         {
-           fprintf(stderr, "ftdi_new failed\n");
+           flog::error("ftdi_new failed");
            return;
         }
 
         if (ftdi_set_interface(ftdi, INTERFACE_A) < 0)
         {
-           fprintf(stderr, "ftdi_set_interface failed\n");
+           flog::error("ftdi_set_interface failed");
            ftdi_free(ftdi);
            return;
         }
 
         if (ftdi_usb_open_desc(ftdi, MICRON_VEN, MICRON_DEV, nullptr, serial.c_str()) < 0)
         {
-           fprintf(stderr, "ftdi_usb_open_desc failed\n");
+           flog::error("ftdi_usb_open_desc failed");
            ftdi_free(ftdi);
            return;
         }
@@ -41,7 +41,7 @@ namespace micron {
         /* A timeout value of 1 results in may skipped blocks */
         if(ftdi_set_latency_timer(ftdi, 2))
         {
-           fprintf(stderr,"Can't set latency, Error %s\n",ftdi_get_error_string(ftdi));
+           flog::error("Can't set latency, Error {}",ftdi_get_error_string(ftdi));
            ftdi_usb_close(ftdi);
            ftdi_free(ftdi);
            return;
@@ -49,7 +49,7 @@ namespace micron {
 
         if (ftdi_set_bitmode(ftdi,  0xff, BITMODE_SYNCFF) < 0)
         {
-            fprintf(stderr,"Can't set bitmode, Error %s\n",ftdi_get_error_string(ftdi));
+            flog::error("Can't set bitmode, Error {}",ftdi_get_error_string(ftdi));
             ftdi_usb_close(ftdi);
             ftdi_free(ftdi);
             return;
@@ -57,7 +57,7 @@ namespace micron {
 
         if(ftdi_usb_purge_rx_buffer(ftdi) < 0)
         {
-           fprintf(stderr,"Can't rx purge\n",ftdi_get_error_string(ftdi));
+           flog::error("Can't rx purge, Error {}",ftdi_get_error_string(ftdi));
            return;
         }
 
@@ -128,7 +128,7 @@ namespace micron {
         iBytesWritten = ftdi_write_data(ftdi,  lBa, MICRON_CTRL_PACKET_SIZE);
         if(iBytesWritten > 0)
         {
-            printf("%i bytes written\n", iBytesWritten);
+            flog::info("{} bytes written", iBytesWritten);
         }
 
     }
@@ -207,13 +207,13 @@ namespace micron {
         ftdi_context * ftdi = nullptr;
         if ((ftdi = ftdi_new()) == 0)
         {
-           fprintf(stderr, "ftdi_new failed\n");
+           flog::error("ftdi_new failed");
            return devices;
         }
 
         if (ftdi_set_interface(ftdi, INTERFACE_A) < 0)
         {
-           fprintf(stderr, "ftdi_set_interface failed\n");
+           flog::error("ftdi_set_interface failed");
            ftdi_free(ftdi);
            return devices;
         }
@@ -221,7 +221,7 @@ namespace micron {
         ftdi_device_list * pFtdiDeviceList = nullptr;
         if(ftdi_usb_find_all(ftdi, &pFtdiDeviceList, MICRON_VEN, MICRON_DEV) < 0)
         {
-           fprintf(stderr, "ftdi_set_interface failed\n");
+           flog::error("ftdi_set_interface failed");
            ftdi_free(ftdi);
            return devices;
         }
