@@ -168,7 +168,7 @@ namespace micron {
                         out.writeBuf[i].im = (float)si / (float)0x1000000;
                         out.writeBuf[i].re = (float)sq / (float)0x1000000;
                     }
-                    out.swap(81);
+                    out.swap(82);
                 }
                 else
                 {
