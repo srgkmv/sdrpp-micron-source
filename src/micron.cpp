@@ -34,7 +34,7 @@ void Client::ReceiveData()
     FT_STATUS status = FT_GetQueueStatus(deviceHandle, &bytesAvailable);
     if (status != FT_OK)
     {
-        flog::error("FT_GetQueueStatus() failed, status = {}", status);
+        flog::error("FT_GetQueueStatus() failed, status = {}", (int)status);
         std::this_thread::sleep_for(2000ms);
         return;
     }
@@ -61,7 +61,7 @@ void Client::ReceiveData()
     status = FT_Read(deviceHandle, g_receiveBuffer + g_bytesReceived, bytesToReceive, &bytesReceived);
     if (status != FT_OK)
     {
-        flog::error("FT_Read() failed, status = %i", status);
+        flog::error("FT_Read() failed, status = %i", (int)status);
         std::this_thread::sleep_for(2000ms);
         return;
     }
@@ -81,11 +81,11 @@ void Client::ReceiveData()
     status = FT_GetQueueStatus(deviceHandle, &bytesAvailable);
     if (status != FT_OK)
     {
-        flog::error("FT_GetQueueStatus() failed, status = {}", status);
+        flog::error("FT_GetQueueStatus() failed, status = {}", (int)status);
         std::this_thread::sleep_for(2000ms);
         return;
     }
-    if(bytesAvailable> 1000) flog::warn("bytesAvailable {} bytes", bytesAvailable);
+    if(bytesAvailable> 1000) flog::warn("bytesAvailable {} bytes", (int)bytesAvailable);
 
     if (bytesAvailable == 0)
         return;	// Best case: no additional bytes
@@ -105,7 +105,7 @@ void Client::ReceiveData()
     status = FT_Read(deviceHandle, g_receiveBuffer + g_bytesReceived, bytesToReceive, &bytesReceived);
     if (status != FT_OK)
     {
-        flog::error("FT_Read() failed, status = {}", status);
+        flog::error("FT_Read() failed, status = {}", (int)status);
         std::this_thread::sleep_for(2000ms);
         return;
     }
@@ -284,21 +284,20 @@ Client::Client(std::string serial) {
     sampleRateIndex = MICRON_SAMP_RATE_384KHZ;
     freq = 0;
     att = 0;
-    gain = 0;
     bexit = false;
 
     FT_HANDLE handle;
     FT_STATUS status = FT_OpenEx((void*)serial.c_str(), FT_OPEN_BY_SERIAL_NUMBER, &handle);
     if (status != FT_OK)
     {
-        flog::error("FT_OpenEx(\"{}\") failed, status = {}", serial, status);
+        flog::error("FT_OpenEx(\"{}\") failed, status = {}", serial, (int)status);
         return;
     }
 
     status = FT_SetBitMode(handle, 255, 64);
     if (status != FT_OK)
     {
-        flog::error("FT_SetBitMode() failed, status = {}", status);
+        flog::error("FT_SetBitMode() failed, status = {}", (int)status);
         FT_Close(handle);
         return;
     }
@@ -306,7 +305,7 @@ Client::Client(std::string serial) {
     status = FT_SetTimeouts(handle, USB_READ_TIMEOUT, USB_WRITE_TIMEOUT);
     if (status != FT_OK)
     {
-        flog::error("FT_SetTimeouts() failed, status = {}", status);
+        flog::error("FT_SetTimeouts() failed, status = {}", (int)status);
         FT_Close(handle);
         return;
     }
@@ -322,7 +321,7 @@ Client::Client(std::string serial) {
     status = FT_SetUSBParameters(handle, USB_BUFFER_SIZE, USB_BUFFER_SIZE);
     if (status != FT_OK)
     {
-        flog::error("FT_SetUSBParameters() failed, status = {}", status);
+        flog::error("FT_SetUSBParameters() failed, status = {}", (int)status);
         FT_Close(handle);
         return;
     }
@@ -346,13 +345,13 @@ void Client::close() {
     FT_STATUS status = FT_SetBitMode(deviceHandle, 255, 0);
     if (status != FT_OK)
     {
-        flog::error("CloseRxDevice() -- FT_SetBitMode() failed, status = {}", status);
+        flog::error("CloseRxDevice() -- FT_SetBitMode() failed, status = {}", (int)status);
     }
 
     status = FT_Close(deviceHandle);
     if (status != FT_OK)
     {
-        flog::error("CloseRxDevice() -- FT_Close() failed, status = {}", status);
+        flog::error("CloseRxDevice() -- FT_Close() failed, status = {}", (int)status);
     }
 }
 
@@ -381,12 +380,6 @@ void Client::setAtt(int att) {
     controlRx();
 }
 
-void Client::setGain(int gain)
-{
-    this->gain = gain;
-    controlRx();
-}
-
 void Client::controlRx()
 {
     unsigned char lBa[MICRON_CTRL_PACKET_SIZE];
@@ -401,7 +394,7 @@ void Client::controlRx()
     lBa[17] = ((char)att);   //attenuation
     lBa[18] = 0x0;//nbs_on
     lBa[19] = 0x0;//nbs_period
-    lBa[20] = ((char)gain);//rx_shift
+    lBa[20] = 0x0;
     for(int i = 21; i < MICRON_CTRL_PACKET_SIZE; i++)
         lBa[i] = 0x00;
 
@@ -435,7 +428,7 @@ void Client::worker() {
         FT_STATUS status = FT_CreateDeviceInfoList(&numDevices);
         if (status != FT_OK)
         {
-            flog::error("FT_CreateDeviceInfoList() failed, status = {}", status);
+        flog::error("FT_CreateDeviceInfoList() failed, status = {}", (int)status);
             return devices;
         }
 
@@ -453,7 +446,7 @@ void Client::worker() {
             status = FT_GetDeviceInfoDetail(i, &flags, &type, &id, &locId, serialNumber, description, &handle);
             if (status != FT_OK)
             {
-                flog::error("FT_GetDeviceInfoDetail({}) failed, status = {}", i, status);
+                flog::error("FT_GetDeviceInfoDetail({}) failed, status = {}", (int)i, (int)status);
             }
             else if (strncmp(description, DEVICE_NAME, sizeof DEVICE_NAME) == 0)
             {

@@ -57,7 +57,6 @@ namespace micron {
         void setSamplerate(MicronSamplerate samplerate);
         void setFrequency(double freq);
         void setAtt(int att);
-        void setGain(int gain);
 
 
         void controlRx();
@@ -74,7 +73,6 @@ namespace micron {
         int sampleRateIndex;
         unsigned int freq;
         int att;
-        int gain;
         std::thread workerThread;
         void * deviceHandle;
         std::string serial;
