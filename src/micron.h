@@ -33,6 +33,19 @@ namespace micron {
 
 
     class Client {
+
+        uint8_t * g_receiveBuffer;
+        int g_bytesReceived;
+        int g_preamble_displacement_extra;
+        int g_outputCount;
+
+
+        void ReceiveData();
+        void ProcessData();
+        int FindPreamble(uint8_t *data, int dataLen);
+        void ProcessBlock(uint8_t *block);
+        void ProcessIQ24(uint8_t * block, int count);
+        void ProcessIQ16(uint8_t * block, int count);
     public:
         Client(std::string serial);
 
@@ -63,7 +76,7 @@ namespace micron {
         int att;
         int gain;
         std::thread workerThread;
-        ftdi_context * ftdi;
+        void * deviceHandle;
         std::string serial;
 
     };
