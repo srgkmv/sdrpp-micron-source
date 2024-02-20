@@ -16,7 +16,7 @@
 SDRPP_MOD_INFO{
     /* Name:            */ "micron_source",
     /* Description:     */ "SDR-Micron source module for SDR++",
-    /* Author:          */ "Sergej Komov",
+    /* Author:          */ "Sergey Komov",
     /* Version:         */ 0, 1, 0,
     /* Max instances    */ 1
 };
@@ -108,7 +108,6 @@ private:
         // Default config
         srId = samplerates.valueId(micron::MICRON_SAMP_RATE_384KHZ);
         att = 0;
-        gain = 0;
 
         // Load config
         devId = devices.keyId(serial);
@@ -120,9 +119,6 @@ private:
         }
         if (config.conf["devices"][selectedSerial].contains("att")) {
             att = config.conf["devices"][selectedSerial]["att"];
-        }
-        if (config.conf["devices"][selectedSerial].contains("gain")) {
-            gain = config.conf["devices"][selectedSerial]["gain"];
         }
         config.release();
 
@@ -253,18 +249,6 @@ private:
                 config.release(true);
             }
         }
-        SmGui::LeftLabel("CIC Gain");
-        SmGui::FillWidth();
-        if (SmGui::SliderInt("##micron_source_gain", &_this->gain, 0, 8)) {
-            if (_this->running) {
-                _this->dev->setGain(_this->gain);
-            }
-            if (!_this->selectedSerial.empty()) {
-                config.acquire();
-                config.conf["devices"][_this->selectedSerial]["gain"] = _this->gain;
-                config.release(true);
-            }
-        }
     }
 
     std::string name;
@@ -283,7 +267,6 @@ private:
     int devId = 0;
     int srId = 0;
     int att = 0;
-    int gain = 0;
 
     bool firstSelect = true;
 

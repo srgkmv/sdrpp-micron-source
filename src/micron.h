@@ -6,7 +6,9 @@
 #include <string>
 #include <thread>
 
-struct ftdi_context;
+#define NUM_USB_XFERS 1
+struct libusb_device_handle;
+struct libusb_transfer;
 
 namespace micron {
     struct Info {
@@ -33,6 +35,8 @@ namespace micron {
 
 
     class Client {
+
+        libusb_device_handle *openDevice(const std::string & serial);
     public:
         Client(std::string serial);
 
@@ -63,7 +67,9 @@ namespace micron {
         int att;
         int gain;
         std::thread workerThread;
-        ftdi_context * ftdi;
+        libusb_device_handle *  deviceHandle;
+        libusb_transfer *       transfer[NUM_USB_XFERS];
+        std::vector< char > recvBuffer;
         std::string serial;
 
     };
