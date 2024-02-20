@@ -140,8 +140,6 @@ Client::Client(std::string serial) {
                         if(transfer->actual_length-2 != MICRON_DATA_PACKET_SIZE)
                         {
                             flog::warn("Micron: Broken packet received: {} bytes", transfer->actual_length);
-                            for(int i =2; i < std::min(16,transfer->actual_length); i++)
-                                flog::warn("Micron: Broken packet data[{}] = {}", i-2, transfer->buffer[i]);
                         }
 
                         std::vector<char> packet(transfer->buffer+2, transfer->buffer + transfer->actual_length);
@@ -194,7 +192,7 @@ Client::Client(std::string serial) {
                                         THIS->out.writeBuf[i].im = (float)si / (float)0x1000000;
                                         THIS->out.writeBuf[i].re = (float)sq / (float)0x1000000;
                                     }
-                                    THIS->out.swap(81);
+                                    THIS->out.swap(82);
                                 }
                                 else
                                 {
