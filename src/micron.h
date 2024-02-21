@@ -40,6 +40,7 @@ namespace micron {
         int g_outputCount;
 
 
+        bool CleanUSBBuffer();
         void ReceiveData();
         void ProcessData();
         int FindPreamble(uint8_t *data, int dataLen);
