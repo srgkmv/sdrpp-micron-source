@@ -26,6 +26,10 @@ using namespace std::chrono_literals;
 #define MICRON_CTRL_PACKET_SIZE 32
 #define MICRON_DATA_PACKET_SIZE 508
 
+#ifdef WIN32
+#define __bswap_32 _byteswap_ulong
+#endif
+
 namespace micron {
 void Client::ReceiveData()
 {
@@ -313,7 +317,7 @@ Client::Client(std::string serial) {
     status = FT_SetLatencyTimer(handle, 2);
     if (status != FT_OK)
     {
-        flog::error("FT_SetLatencyTimer() failed, status = {}", status);
+        flog::error("FT_SetLatencyTimer() failed, status = {}", (int)status);
         FT_Close(handle);
         return ;
     }
@@ -403,7 +407,7 @@ void Client::controlRx()
     FT_STATUS status = FT_Write(deviceHandle, lBa, MICRON_CTRL_PACKET_SIZE, &bytesWritten);
     if (status != FT_OK)
     {
-        flog::error("FT_Write(RX_DEVICE_CONTROL_PACKET) failed, status = {}", status);
+        flog::error("FT_Write(RX_DEVICE_CONTROL_PACKET) failed, status = {}", (int)status);
         return;
     }
 }
@@ -432,7 +436,7 @@ void Client::worker() {
             return devices;
         }
 
-        flog::info("Found {} FTDI devices", numDevices);
+        flog::info("Found {} FTDI devices", (int)numDevices);
         int iIndex = 0;
         for (DWORD i = 0; i < numDevices; i++)
         {
