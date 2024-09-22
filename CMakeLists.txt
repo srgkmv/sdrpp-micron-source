@@ -1,6 +1,3 @@
-# Install directives
-install(TARGETS micron_source DESTINATION /usr/lib/sdrpp/plugins)
-
 cmake_minimum_required(VERSION 3.13)
 project(micron_source)
 
